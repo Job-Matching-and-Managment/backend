@@ -13,7 +13,7 @@ import { store } from '@/routes/register';
 
 export default function Register() {
     const [step, setStep] = useState(1);
-    const [role, setRole] = useState(null);
+    const [role, setRole] = useState<'job_seeker' | 'employer' | ''>('');
 
     return (
         <AuthLayout

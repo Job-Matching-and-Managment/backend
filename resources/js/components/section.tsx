@@ -7,7 +7,7 @@ import { Link, usePage } from "@inertiajs/react";
 import { dashboard, login, register } from "@/routes";
 // import { register } from "module";
 
-export default function Section({ id, title, subtitle, content, isActive, showButton, buttonText, canRegister }: SectionProps) {
+export default function Section({ id, title, subtitle, content, isActive, showButton, canRegister }: SectionProps) {
   const { auth } = usePage().props;
 
   return (

@@ -5,6 +5,5 @@
 ## 📸 Screenshots
 
 Preview 1 
-![Description](<img width="1366" height="768" alt="Screenshot (1798)" src="https://github.com/user-attachments/assets/67ca6635-b4d0-4d44-91d8-136bdbffc11c" />
-)
+![Screenshot](https://github.com/user-attachments/assets/67ca6635-b4d0-4d44-91d8-136bdbffc11c)
 ---

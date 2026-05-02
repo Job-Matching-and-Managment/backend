@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { dashboard, login, register } from '@/routes';
+// import { dashboard, login, register } from '@/routes';
 import LandingPage from '@/components/landing-page';
 
 export default function Welcome({

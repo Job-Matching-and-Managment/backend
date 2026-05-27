@@ -16,6 +16,10 @@ class NotificationController extends Controller
     public function index(): Response
     {
         $notifications = AppNotification::where('user_id', auth()->id())
+            ->where(function ($query) {
+                $query->whereNull('announcement_id')
+                    ->orWhereHas('announcement', fn ($announcement) => $announcement->where('is_visible', true));
+            })
             ->latest()
             ->paginate(15);
 
@@ -32,11 +36,19 @@ class NotificationController extends Controller
         $user = auth()->user();
 
         $notifications = AppNotification::where('user_id', $user->id)
+            ->where(function ($query) {
+                $query->whereNull('announcement_id')
+                    ->orWhereHas('announcement', fn ($announcement) => $announcement->where('is_visible', true));
+            })
             ->latest()
             ->limit(20)
             ->get();
 
         $unreadCount = AppNotification::where('user_id', $user->id)
+            ->where(function ($query) {
+                $query->whereNull('announcement_id')
+                    ->orWhereHas('announcement', fn ($announcement) => $announcement->where('is_visible', true));
+            })
             ->unread()
             ->count();
 

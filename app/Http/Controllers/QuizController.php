@@ -105,7 +105,7 @@ class QuizController extends Controller
             ]);
         }
 
-        return back()->with('success', "Your personalized \"{$quiz->title}\" quiz is ready!");
+        return back()->with('success', "Your personalized \"{$quiz->title}\" quiz was generated and is pending admin approval.");
     }
 
     // ─── GET /quiz/{assessment} ───────────────────────────────────────────────
@@ -113,6 +113,10 @@ class QuizController extends Controller
     public function show(Assessment $assessment)
     {
         $userId = auth()->id();
+
+        if ($assessment->is_ai_generated && $assessment->approval_status !== 'approved') {
+            abort(404);
+        }
 
         $questions = $assessment->questions()
             ->with('options:id,question_id,option_text,sort_order')

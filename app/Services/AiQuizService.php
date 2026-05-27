@@ -47,6 +47,7 @@ class AiQuizService
     {
         return Assessment::where('user_id', $userId)
             ->where('is_ai_generated', true)
+            ->where('approval_status', 'approved')
             ->withCount('questions')
             ->first();
     }
@@ -193,8 +194,9 @@ PROMPT;
             'difficulty'         => 'intermediate',
             'time_limit_minutes' => 15,
             'pass_score'         => 70,
-            'is_active'          => true,
+            'is_active'          => false,
             'is_ai_generated'    => true,
+            'approval_status'    => 'pending',
         ]);
 
         foreach (array_slice($questions, 0, 10) as $sortOrder => $q) {

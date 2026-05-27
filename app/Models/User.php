@@ -27,9 +27,12 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at'       => 'datetime',
-            'password'                => 'hashed',
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'is_flagged_suspicious' => 'boolean',
+            'security_flagged_at' => 'datetime',
+            'status_changed_at' => 'datetime',
         ];
     }
 
@@ -39,5 +42,20 @@ class User extends Authenticatable
     public function appNotifications(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AppNotification::class, 'user_id')->latest();
+    }
+
+    public function applications(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Application::class);
+    }
+
+    public function vacancies(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Vacancy::class);
+    }
+
+    public function cvs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Cv::class);
     }
 }

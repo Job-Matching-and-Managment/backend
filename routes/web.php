@@ -1,5 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
+use App\Http\Controllers\Admin\EmployerVerificationController as AdminEmployerVerificationController;
+use App\Http\Controllers\Admin\CompanyVerificationController as AdminCompanyVerificationController;
+use App\Http\Controllers\Admin\JobModerationController as AdminJobModerationController;
+use App\Http\Controllers\Admin\ContentApprovalController as AdminContentApprovalController;
+use App\Http\Controllers\Admin\SuspiciousUserController as AdminSuspiciousUserController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
@@ -20,6 +29,144 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'employer'])->name('dashboard');
 });
 
+// Local preview — must be registered BEFORE admin/users/{user} (not available in production)
+if (app()->environment('local')) {
+    Route::middleware(\App\Http\Middleware\PreviewAdminUser::class)->group(function () {
+        Route::get('/admin/dashboard/preview', [AdminDashboardController::class, 'index'])
+            ->name('admin.dashboard.preview');
+        Route::get('/admin/company-verifications/preview', [AdminCompanyVerificationController::class, 'index'])
+            ->name('admin.company-verifications.preview.index');
+        Route::get('/admin/company-verifications/{user}/preview', [AdminCompanyVerificationController::class, 'show'])
+            ->whereNumber('user')
+            ->name('admin.company-verifications.preview.show');
+        Route::patch('/admin/company-verifications/{user}/preview', [AdminCompanyVerificationController::class, 'update'])
+            ->whereNumber('user')
+            ->name('admin.company-verifications.preview.update');
+        Route::get('/admin/employer-verifications/preview', [AdminEmployerVerificationController::class, 'index'])
+            ->name('admin.employer-verifications.preview.index');
+        Route::get('/admin/employer-verifications/{user}/preview', [AdminEmployerVerificationController::class, 'show'])
+            ->whereNumber('user')
+            ->name('admin.employer-verifications.preview.show');
+        Route::patch('/admin/employer-verifications/{user}/preview', [AdminEmployerVerificationController::class, 'update'])
+            ->whereNumber('user')
+            ->name('admin.employer-verifications.preview.update');
+        Route::get('/admin/users/preview', [AdminUserController::class, 'index'])
+            ->name('admin.users.preview.index');
+        Route::get('/admin/users/{user}/preview', [AdminUserController::class, 'show'])
+            ->whereNumber('user')
+            ->name('admin.users.preview.show');
+        Route::patch('/admin/users/{user}/status/preview', [AdminUserController::class, 'updateStatus'])
+            ->whereNumber('user')
+            ->name('admin.users.preview.status');
+        Route::delete('/admin/users/{user}/preview', [AdminUserController::class, 'destroy'])
+            ->whereNumber('user')
+            ->name('admin.users.preview.destroy');
+        Route::get('/admin/job-moderation/preview', [AdminJobModerationController::class, 'index'])
+            ->name('admin.job-moderation.preview.index');
+        Route::get('/admin/job-moderation/{vacancy}/preview', [AdminJobModerationController::class, 'show'])
+            ->whereNumber('vacancy')
+            ->name('admin.job-moderation.preview.show');
+        Route::patch('/admin/job-moderation/{vacancy}/preview', [AdminJobModerationController::class, 'update'])
+            ->whereNumber('vacancy')
+            ->name('admin.job-moderation.preview.update');
+        Route::get('/admin/suspicious-users/preview', [AdminSuspiciousUserController::class, 'index'])
+            ->name('admin.suspicious-users.preview.index');
+        Route::get('/admin/suspicious-users/{user}/preview', [AdminSuspiciousUserController::class, 'show'])
+            ->whereNumber('user')
+            ->name('admin.suspicious-users.preview.show');
+        Route::patch('/admin/suspicious-users/{user}/preview', [AdminSuspiciousUserController::class, 'update'])
+            ->whereNumber('user')
+            ->name('admin.suspicious-users.preview.update');
+        Route::get('/admin/content-approval/preview', [AdminContentApprovalController::class, 'index'])
+            ->name('admin.content-approval.preview.index');
+        Route::get('/admin/content-approval/quizzes/{assessment}/preview', [AdminContentApprovalController::class, 'showQuiz'])
+            ->whereNumber('assessment')
+            ->name('admin.content-approval.preview.quiz.show');
+        Route::patch('/admin/content-approval/quizzes/{assessment}/preview', [AdminContentApprovalController::class, 'updateQuiz'])
+            ->whereNumber('assessment')
+            ->name('admin.content-approval.preview.quiz.update');
+        Route::get('/admin/content-approval/summaries/{cv}/preview', [AdminContentApprovalController::class, 'showSummary'])
+            ->whereNumber('cv')
+            ->name('admin.content-approval.preview.summary.show');
+        Route::patch('/admin/content-approval/summaries/{cv}/preview', [AdminContentApprovalController::class, 'updateSummary'])
+            ->whereNumber('cv')
+            ->name('admin.content-approval.preview.summary.update');
+        Route::get('/admin/announcements/preview', [AdminAnnouncementController::class, 'index'])
+            ->name('admin.announcements.preview.index');
+        Route::post('/admin/announcements/preview', [AdminAnnouncementController::class, 'store'])
+            ->name('admin.announcements.preview.store');
+        Route::patch('/admin/announcements/{announcement}/visibility/preview', [AdminAnnouncementController::class, 'toggleVisibility'])
+            ->whereNumber('announcement')
+            ->name('admin.announcements.preview.visibility');
+        Route::get('/admin/reports/preview', [AdminReportController::class, 'index'])
+            ->name('admin.reports.preview.index');
+    });
+}
+
+// ── Admin routes (role: admin) ───────────────────────────────────────────────
+Route::prefix('admin')
+    ->middleware(['auth', 'verified', 'role:admin'])
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/company-verifications', [AdminCompanyVerificationController::class, 'index'])->name('company-verifications.index');
+        Route::get('/company-verifications/{user}', [AdminCompanyVerificationController::class, 'show'])
+            ->whereNumber('user')
+            ->name('company-verifications.show');
+        Route::patch('/company-verifications/{user}', [AdminCompanyVerificationController::class, 'update'])
+            ->whereNumber('user')
+            ->name('company-verifications.update');
+        Route::get('/employer-verifications', [AdminEmployerVerificationController::class, 'index'])->name('employer-verifications.index');
+        Route::get('/employer-verifications/{user}', [AdminEmployerVerificationController::class, 'show'])
+            ->whereNumber('user')
+            ->name('employer-verifications.show');
+        Route::patch('/employer-verifications/{user}', [AdminEmployerVerificationController::class, 'update'])
+            ->whereNumber('user')
+            ->name('employer-verifications.update');
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [AdminUserController::class, 'show'])
+            ->whereNumber('user')
+            ->name('users.show');
+        Route::patch('/users/{user}/status', [AdminUserController::class, 'updateStatus'])
+            ->whereNumber('user')
+            ->name('users.status');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])
+            ->whereNumber('user')
+            ->name('users.destroy');
+        Route::get('/job-moderation', [AdminJobModerationController::class, 'index'])->name('job-moderation.index');
+        Route::get('/job-moderation/{vacancy}', [AdminJobModerationController::class, 'show'])
+            ->whereNumber('vacancy')
+            ->name('job-moderation.show');
+        Route::patch('/job-moderation/{vacancy}', [AdminJobModerationController::class, 'update'])
+            ->whereNumber('vacancy')
+            ->name('job-moderation.update');
+        Route::get('/suspicious-users', [AdminSuspiciousUserController::class, 'index'])->name('suspicious-users.index');
+        Route::get('/suspicious-users/{user}', [AdminSuspiciousUserController::class, 'show'])
+            ->whereNumber('user')
+            ->name('suspicious-users.show');
+        Route::patch('/suspicious-users/{user}', [AdminSuspiciousUserController::class, 'update'])
+            ->whereNumber('user')
+            ->name('suspicious-users.update');
+        Route::get('/content-approval', [AdminContentApprovalController::class, 'index'])->name('content-approval.index');
+        Route::get('/content-approval/quizzes/{assessment}', [AdminContentApprovalController::class, 'showQuiz'])
+            ->whereNumber('assessment')
+            ->name('content-approval.quiz.show');
+        Route::patch('/content-approval/quizzes/{assessment}', [AdminContentApprovalController::class, 'updateQuiz'])
+            ->whereNumber('assessment')
+            ->name('content-approval.quiz.update');
+        Route::get('/content-approval/summaries/{cv}', [AdminContentApprovalController::class, 'showSummary'])
+            ->whereNumber('cv')
+            ->name('content-approval.summary.show');
+        Route::patch('/content-approval/summaries/{cv}', [AdminContentApprovalController::class, 'updateSummary'])
+            ->whereNumber('cv')
+            ->name('content-approval.summary.update');
+        Route::get('/announcements', [AdminAnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('/announcements', [AdminAnnouncementController::class, 'store'])->name('announcements.store');
+        Route::patch('/announcements/{announcement}/visibility', [AdminAnnouncementController::class, 'toggleVisibility'])
+            ->whereNumber('announcement')
+            ->name('announcements.visibility');
+        Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+    });
 
 // ── Employer routes (role: employer) ─────────────────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {

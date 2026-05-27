@@ -22,9 +22,31 @@ class Vacancy extends Model
         'status',
         'work_type',
         'application_deadline',
+        'moderation_status',
+        'is_archived',
+        'is_flagged_suspicious',
+        'moderation_notes',
+        'moderated_at',
+        'moderated_by',
     ];
 
-    public function applications(){
+    protected function casts(): array
+    {
+        return [
+            'is_archived' => 'boolean',
+            'is_flagged_suspicious' => 'boolean',
+            'moderated_at' => 'datetime',
+            'application_deadline' => 'date',
+        ];
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function applications()
+    {
         return $this->hasMany(Application::class);
     }
 }
